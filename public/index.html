@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filmes MongoDB</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .movie-card {
+            height: 100%;
+            transition: transform 0.3s;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .movie-poster {
+            height: 300px;
+            object-fit: cover;
+        }
+        .votos {
+            color: #6c757d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Filmes MongoDB</a>
+            <form class="d-flex" id="search-form">
+                <input class="form-control me-2" type="search" placeholder="Buscar filmes..." id="search-input">
+                <button class="btn btn-outline-light" type="submit">Buscar</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 id="page-title">Filmes</h1>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="btn-group" role="group" aria-label="Gêneros de filmes">
+                    <button type="button" class="btn btn-outline-primary genre-btn" data-genre="Action">Ação</button>
+                    <button type="button" class="btn btn-outline-primary genre-btn" data-genre="Comedy">Comédia</button>
+                    <button type="button" class="btn btn-outline-primary genre-btn" data-genre="Drama">Drama</button>
+                    <button type="button" class="btn btn-outline-primary genre-btn" data-genre="Thriller">Suspense</button>
+                </div>
+            </div>
+        </div>
+        <div id="movies-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4"></div>
+        <div id="pagination" class="d-flex justify-content-center mt-4"></div>
+        <div id="loading" class="text-center my-5">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes do Filme -->
+    <div class="modal fade" id="movieModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="movieModalTitle"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="movieModalBody">
+                    <!-- Conteúdo do filme será inserido aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuração da API
+        const API_URL = 'http://localhost:3000/api';
+        let currentPage = 1;
+        let totalPages = 1;
+
+        // Elementos DOM
+        const moviesContainer = document.getElementById('movies-container');
+        const paginationContainer = document.getElementById('pagination');
+        const loadingElement = document.getElementById('loading');
+        const pageTitle = document.getElementById('page-title');
+        const searchForm = document.getElementById('search-form');
+        const searchInput = document.getElementById('search-input');
+        const movieModal = new bootstrap.Modal(document.getElementById('movieModal'));
+        const genreButtons = document.querySelectorAll('.genre-btn');
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMovies();
+        });
+
+        genreButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const genre = button.getAttribute('data-genre');
+                pageTitle.textContent = `Filmes de ${button.textContent}`;
+                fetchMoviesByGenre(genre);
+                
+                // Marcar botão ativo
+                genreButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (query) {
+                pageTitle.textContent = `Resultados para: "${query}"`;
+                searchMovies(query);
+                
+                // Remover qualquer botão de gênero ativo
+                genreButtons.forEach(btn => btn.classList.remove('active'));
+            }
+        });
+
+        // Funções de API
+        async function fetchMovies(page = 1) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/movies?page=${page}&limit=8`);
+                const data = await response.json();
+                
+                renderMovies(data.movies);
+                currentPage = data.currentPage;
+                totalPages = data.totalPages;
+                renderPagination();
+            } catch (error) {
+                console.error('Erro ao carregar filmes:', error);
+                moviesContainer.innerHTML = '<div class="col-12 text-center"><h3>Erro ao carregar filmes. Tente novamente.</h3></div>';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function fetchMoviesByGenre(genre) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/movies/genre/${genre}`);
+                const movies = await response.json();
+                
+                renderMovies(movies);
+                paginationContainer.innerHTML = ''; // Sem paginação para filmes por gênero
+            } catch (error) {
+                console.error(`Erro ao carregar filmes de ${genre}:`, error);
+                moviesContainer.innerHTML = '<div class="col-12 text-center"><h3>Erro ao carregar filmes. Tente novamente.</h3></div>';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function searchMovies(query) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/movies/search?query=${encodeURIComponent(query)}`);
+                const movies = await response.json();
+                
+                renderMovies(movies);
+                paginationContainer.innerHTML = ''; // Sem paginação para resultados de busca
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                moviesContainer.innerHTML = '<div class="col-12 text-center"><h3>Erro ao buscar filmes. Tente novamente.</h3></div>';
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function fetchMovieDetails(id) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/movies/${id}`);
+                const movie = await response.json();
+                
+                renderMovieDetails(movie);
+                movieModal.show();
+            } catch (error) {
+                console.error('Erro ao carregar detalhes do filme:', error);
+                alert('Erro ao carregar detalhes do filme. Tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Funções de Renderização
+        function renderMovies(movies) {
+            if (!movies || movies.length === 0) {
+                moviesContainer.innerHTML = '<div class="col-12 text-center"><h3>Nenhum filme encontrado.</h3></div>';
+                return;
+            }
+
+            moviesContainer.innerHTML = '';
+            
+            movies.forEach(movie => {
+                const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.jpg';
+                const rating = movie.imdb?.rating ? movie.imdb.rating.toFixed(1) : 'N/A';
+                
+                const movieElement = document.createElement('div');
+                movieElement.className = 'col';
+                movieElement.innerHTML = `
+                    <div class="card movie-card">
+                        <img src="${posterUrl}" class="card-img-top movie-poster" alt="${movie.title}" onerror="this.onerror=null; this.src='/assets/sem-poster.jpg';">
+                        <div class="card-body">
+                            <h5 class="card-title">${movie.title}</h5>
+                            <p class="card-text text-muted">${movie.year || 'Ano desconhecido'}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-warning text-dark">⭐ ${rating}</span>
+                                <button class="btn btn-sm btn-primary view-details" data-id="${movie._id}">Ver mais</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Adicionando event listener para o botão de detalhes
+                const detailsButton = movieElement.querySelector('.view-details');
+                detailsButton.addEventListener('click', () => fetchMovieDetails(movie._id));
+                
+                moviesContainer.appendChild(movieElement);
+            });
+        }
+
+        function renderMovieDetails(movie) {
+            const modalTitle = document.getElementById('movieModalTitle');
+            const modalBody = document.getElementById('movieModalBody');
+            
+            modalTitle.textContent = movie.title;
+            
+            const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.jpg';
+            const rating = movie.imdb?.rating ? movie.imdb.rating.toFixed(1) : 'N/A';
+            const plot = movie.plot || 'Sinopse não disponível.';
+            const runtime = movie.runtime ? `${movie.runtime} min` : 'Duração desconhecida';
+            
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <img src="${posterUrl}" class="img-fluid rounded" alt="${movie.title}" onerror="this.onerror=null; this.src='/assets/sem-poster.jpg';">
+                        <div class="mt-3">
+                            <h5>
+                                ${rating !== 'N/A' ? `⭐ ${rating}/10` : 'N/A'} 
+                                <span class="votos" >${movie.imdb?.votes !== null ? `(${movie.imdb.votes} votos)` : ''} </span>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <p><strong>Ano:</strong> ${movie.year || 'N/A'}</p>
+                        <p><strong>Duração:</strong> ${runtime}</p>
+                        <p><strong>Classificação:</strong> ${movie.rated || 'N/A'}</p>
+                        <p><strong>Gêneros:</strong> ${movie.genres?.join(', ') || 'N/A'}</p>
+                        <p><strong>Diretores:</strong> ${movie.directors?.join(', ') || 'N/A'}</p>
+                        <p><strong>Elenco:</strong> ${movie.cast?.join(', ') || 'N/A'}</p>
+                        <p><strong>Sinopse:</strong> ${plot}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPagination() {
+            paginationContainer.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            const ul = document.createElement('ul');
+            ul.className = 'pagination';
+            
+            // Botão anterior
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+            prevLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Anterior</a>`;
+            ul.appendChild(prevLi);
+            
+            // Páginas
+            const maxPages = 5;
+            const startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+            const endPage = Math.min(totalPages, startPage + maxPages - 1);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+                ul.appendChild(li);
+            }
+            
+            // Botão próximo
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+            nextLi.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Próximo</a>`;
+            ul.appendChild(nextLi);
+            
+            paginationContainer.appendChild(ul);
+            
+            // Adicionando event listeners para os links de página
+            paginationContainer.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = parseInt(e.target.getAttribute('data-page'));
+                    if (page && page !== currentPage && page > 0 && page <= totalPages) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        fetchMovies(page);
+                    }
+                });
+            });
+        }
+
+        // Funções auxiliares
+        function showLoading() {
+            loadingElement.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingElement.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
