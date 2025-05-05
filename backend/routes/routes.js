@@ -3,7 +3,9 @@ import {
   getMovies, 
   getMovieById, 
   searchMovies, 
-  getMoviesByGenre
+  filterMovies,
+  getAllGenres,
+  getAllCountries
 } from '../controllers/movieController.js';
 import {
   getComments,
@@ -16,13 +18,13 @@ import {
 
 const router = express.Router();
 
-// Rotas para API de filmes
 router.get('/api/movies', getMovies);
 router.get('/api/movies/search', searchMovies);
-router.get('/api/movies/genre/:genre', getMoviesByGenre);
+router.get('/api/movies/filter', filterMovies); 
+router.get('/api/movies/genres', getAllGenres); 
+router.get('/api/movies/countries', getAllCountries); 
 router.get('/api/movies/:id', getMovieById);
 
-// Rotas para API de comentários
 router.get('/api/comments', getComments);
 router.get('/api/comments/:id', getCommentById);
 router.get('/api/movies/:movie_id/comments', getCommentsByMovieId);
@@ -30,7 +32,6 @@ router.post('/api/comments', createComment);
 router.put('/api/comments/:id', updateComment);
 router.delete('/api/comments/:id', deleteComment);
 
-// Rota para a página inicial
 router.get('/', (req, res) => {
   res.json({ 
     message: 'API de Filmes MongoDB - Sample_mflix',
@@ -39,7 +40,9 @@ router.get('/', (req, res) => {
         getAllMovies: '/api/movies?page=1&limit=10',
         getMovieById: '/api/movies/:id',
         searchMovies: '/api/movies/search?query=star wars',
-        getMoviesByGenre: '/api/movies/genre/action'
+        filterMovies: '/api/movies/filter?genre=action&year=2000&min_rating=7',
+        getAllGenres: '/api/movies/genres',
+        getAllCountries: '/api/movies/countries'
       },
       comments: {
         getAllComments: '/api/comments',

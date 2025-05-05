@@ -1,6 +1,6 @@
 import Movie from '../models/Movie.js';
+import mongoose from 'mongoose';
 
-// Obter filmes com paginação
 export const getMovies = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -26,7 +26,6 @@ export const getMovies = async (req, res) => {
   }
 };
 
-// Obter filme por ID
 export const getMovieById = async (req, res) => {
   try {
     const movie = await Movie.findById(req.params.id);
@@ -39,7 +38,6 @@ export const getMovieById = async (req, res) => {
   }
 };
 
-// Pesquisar filmes
 export const searchMovies = async (req, res) => {
   try {
     const { query } = req.query;
@@ -59,18 +57,90 @@ export const searchMovies = async (req, res) => {
   }
 };
 
-// Obter filmes por gênero
-export const getMoviesByGenre = async (req, res) => {
+export const filterMovies = async (req, res) => {
   try {
-    const { genre } = req.params;
-    const movies = await Movie.find({ 
-      genres: { $regex: genre, $options: 'i' } 
-    })
-    .select('title year poster imdb.rating genres')
-    .sort({ 'imdb.votes': -1 }) 
-    .limit(20);
+    const { 
+      genre, 
+      year, 
+      min_rating, 
+      type, 
+      country, 
+      sort_by = 'imdb.rating', 
+      sort_order = '-1',
+      page = 1,
+      limit = 12
+    } = req.query;
     
-    res.json(movies);
+    const query = {};
+    
+    if (genre) {
+      query.genres = { $regex: genre, $options: 'i' };
+    }
+    
+    if (year) {
+      query.year = parseInt(year);
+    }
+    
+    if (min_rating) {
+      query['imdb.rating'] = { $gte: parseFloat(min_rating) };
+    }
+    
+    if (type) {
+      query.type = { $regex: type, $options: 'i' };
+    }
+    
+    if (country) {
+      query.countries = { $regex: country, $options: 'i' };
+    }
+    
+    const sortDirection = sort_order === '1' ? 1 : -1;
+    const sortObject = {};
+    sortObject[sort_by] = sortDirection;
+    
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const movies = await Movie.find(query)
+      .select('title year poster imdb.rating genres')
+      .sort(sortObject)
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const total = await Movie.countDocuments(query);
+    
+    res.json({
+      movies,
+      totalPages: Math.ceil(total / parseInt(limit)),
+      currentPage: parseInt(page),
+      total
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllGenres = async (req, res) => {
+  try {
+    const genres = await Movie.distinct('genres');
+    
+    const filteredGenres = genres
+      .filter(genre => genre && genre.trim() !== '')
+      .sort((a, b) => a.localeCompare(b));
+    
+    res.json(filteredGenres);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllCountries = async (req, res) => {
+  try {
+    const countries = await Movie.distinct('countries');
+    
+    const filteredCountries = countries
+      .filter(country => country && country.trim() !== '')
+      .sort((a, b) => a.localeCompare(b));
+    
+    res.json(filteredCountries);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -202,22 +202,20 @@
             }
         }
 
-        // Funções de renderização
         function renderMovieDetails(movie) {
             const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.jpg';
             const rating = movie.imdb?.rating ? movie.imdb.rating.toFixed(1) : 'N/A';
             const plot = movie.plot || 'Sinopse não disponível.';
             const runtime = movie.runtime ? `${movie.runtime} min` : 'Duração desconhecida';
             
-            // Criar badges para os gêneros
             const genresBadges = movie.genres?.map(genre => 
-                `<span class="badge bg-secondary genre-badge">${genre}</span>`
+                `<span class="badge bg-secondary genre-badge" onclick="window.location.href='index.html?genre=${encodeURIComponent(genre)}'">${genre}</span>`
             ).join('') || 'N/A';
             
             movieDetailsContainer.innerHTML = `
                 <div class="col-md-4 text-center mb-4">
                     <img src="${posterUrl}" class="img-fluid rounded movie-poster" alt="${movie.title}" 
-                         onerror="this.onerror=null; this.src='assets/sem-poster.jpg';">
+                        onerror="this.onerror=null; this.src='assets/sem-poster.jpg';">
                     <div class="mt-3">
                         <h4 class="badge bg-warning text-dark rating-badge">
                             ⭐ ${rating}/10

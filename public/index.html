@@ -215,10 +215,30 @@
         const activeFiltersContainer = document.getElementById('active-filters');
         const ratingButtons = document.querySelectorAll('#rating-filter button');
 
-        // Event Listeners
         document.addEventListener('DOMContentLoaded', async () => {
             await loadFilterOptions();
-            fetchMovies();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const genreParam = urlParams.get('genre');
+            
+            if (genreParam) {
+                activeFilters.genre = genreParam;
+                pageTitle.textContent = `Filmes do gênero: ${genreParam}`;
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.genre-badge').forEach(badge => {
+                        if (badge.dataset.genre === genreParam) {
+                            badge.classList.add('active');
+                        }
+                    });
+                    
+                    clearFiltersBtn.style.display = 'inline-block';
+                    
+                    fetchMoviesWithFilters();
+                }, 500);
+            } else {
+                fetchMovies();
+            }
         });
 
         searchForm.addEventListener('submit', (e) => {
@@ -294,19 +314,16 @@
             updateActiveFiltersDisplay();
             clearFiltersBtn.style.display = 'inline-block';
             
-            // Construir a URL com os filtros
             const params = new URLSearchParams();
             params.append('page', page);
             params.append('limit', activeFilters.limit);
             
-            // Adicionar filtros se existirem
             if (activeFilters.genre) params.append('genre', activeFilters.genre);
             if (activeFilters.year) params.append('year', activeFilters.year);
             if (activeFilters.rating) params.append('min_rating', activeFilters.rating);
             if (activeFilters.type) params.append('type', activeFilters.type);
             if (activeFilters.country) params.append('country', activeFilters.country);
             
-            // Ordenação
             if (activeFilters.sort) {
                 const [field, order] = activeFilters.sort.split(':');
                 params.append('sort_by', field);
