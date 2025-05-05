@@ -196,7 +196,7 @@ async function fetchComments(movieId) {
 }
 
 function renderMovieDetails(movie) {
-    const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.jpg';
+    const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.gif';
     const rating = movie.imdb?.rating ? movie.imdb.rating.toFixed(1) : 'N/A';
     const plot = movie.plot || 'Sinopse não disponível.';
     const runtime = movie.runtime ? `${movie.runtime} min` : 'Duração desconhecida';
@@ -208,7 +208,7 @@ function renderMovieDetails(movie) {
     movieDetailsContainer.innerHTML = `
         <div class="col-md-4 text-center mb-4">
             <img src="${posterUrl}" class="img-fluid rounded movie-poster" alt="${movie.title}" 
-                onerror="this.onerror=null; this.src='assets/sem-poster.jpg';">
+                onerror="this.onerror=null; this.src='assets/sem-poster.gif';">
             <div class="mt-3">
                 <h4 class="badge bg-warning text-dark rating-badge">
                     ⭐ ${rating}/10

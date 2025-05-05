@@ -244,14 +244,14 @@ function renderMovies(movies) {
     moviesContainer.innerHTML = '';
     
     movies.forEach(movie => {
-        const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.jpg';
+        const posterUrl = movie.poster && movie.poster !== '' ? movie.poster : 'assets/sem-poster.gif';
         const rating = movie.imdb?.rating ? movie.imdb.rating.toFixed(1) : 'N/A';
         
         const movieElement = document.createElement('div');
         movieElement.className = 'col';
         movieElement.innerHTML = `
             <div class="card movie-card">
-                <img src="${posterUrl}" class="card-img-top movie-poster" alt="${movie.title}" onerror="this.onerror=null; this.src='assets/sem-poster.jpg';">
+                <img src="${posterUrl}" class="card-img-top movie-poster" alt="${movie.title}" onerror="this.onerror=null; this.src='assets/sem-poster.gif';">
                 <div class="card-body">
                     <h5 class="card-title nowrap">${movie.title}</h5>
                     <p class="card-text text-muted">${movie.year || 'Ano desconhecido'}</p>
