@@ -63,6 +63,7 @@ export const filterMovies = async (req, res) => {
       genre, 
       year, 
       min_rating, 
+      max_rating,
       type, 
       country, 
       sort_by = 'imdb.rating', 
@@ -81,8 +82,16 @@ export const filterMovies = async (req, res) => {
       query.year = parseInt(year);
     }
     
-    if (min_rating) {
-      query['imdb.rating'] = { $gte: parseFloat(min_rating) };
+    if (min_rating || max_rating || sort_by === 'imdb.rating') {
+      query['imdb.rating'] = { $ne: null };
+      
+      if (min_rating) {
+        query['imdb.rating'].$gte = parseFloat(min_rating);
+      }
+      
+      if (max_rating) {
+        query['imdb.rating'].$lte = parseFloat(max_rating);
+      }
     }
     
     if (type) {
