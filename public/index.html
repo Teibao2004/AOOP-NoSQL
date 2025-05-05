@@ -6,6 +6,7 @@
     <title>Filmes MongoDB</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.css">
     <style>
         .movie-card {
             height: 100%;
@@ -33,20 +34,42 @@
             font-weight: 500;
             margin-bottom: 5px;
         }
-        .genre-badge {
-            display: inline-block;
-            margin: 2px;
-            cursor: pointer;
-        }
-        .genre-badge.active {
-            background-color: #0d6efd !important;
-            color: white;
-        }
         #movies-container {
             min-height: 400px;
         }
         #no-results {
             display: none;
+        }
+        .genre-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .dropdown-item.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .rating-slider {
+            margin: 30px 10px;
+        }
+        .rating-values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .results-per-page-btn {
+            border-radius: 0;
+        }
+        .results-per-page-btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .results-per-page-btn:first-child {
+            border-top-left-radius: 0.25rem;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .results-per-page-btn:last-child {
+            border-top-right-radius: 0.25rem;
+            border-bottom-right-radius: 0.25rem;
         }
     </style>
 </head>
@@ -79,11 +102,16 @@
             
             <div class="collapse" id="advancedFilters">
                 <div class="row">
-                    <!-- Categorias/Gêneros -->
+                    <!-- Categorias/Gêneros (Dropdown) -->
                     <div class="col-md-6 mb-3">
                         <label class="filter-label">Gêneros</label>
-                        <div id="genres-container">
-                            <!-- Os gêneros serão inseridos aqui dinamicamente -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" id="genreDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                Selecionar gênero
+                            </button>
+                            <ul class="dropdown-menu genre-dropdown w-100" id="genres-container" aria-labelledby="genreDropdown">
+                                <!-- Os gêneros serão inseridos aqui dinamicamente -->
+                            </ul>
                         </div>
                     </div>
                     
@@ -112,14 +140,16 @@
                 </div>
                 
                 <div class="row">
-                    <!-- Classificação -->
-                    <div class="col-md-3 mb-3">
-                        <label class="filter-label">Classificação</label>
-                        <div class="d-flex flex-wrap" id="rating-filter">
-                            <button class="btn btn-sm btn-outline-warning me-1 mb-1" data-rating="7">7+ ⭐</button>
-                            <button class="btn btn-sm btn-outline-warning me-1 mb-1" data-rating="8">8+ ⭐</button>
-                            <button class="btn btn-sm btn-outline-warning me-1 mb-1" data-rating="9">9+ ⭐</button>
+                    <!-- Classificação (Slider) -->
+                    <div class="col-md-6 mb-3">
+                        <label class="filter-label">Classificação (IMDB)</label>
+                        <div id="rating-slider" class="rating-slider"></div>
+                        <div class="rating-values">
+                            <span id="rating-min">0</span>
+                            <span id="rating-max">10</span>
                         </div>
+                        <input type="hidden" id="rating-min-value" value="0">
+                        <input type="hidden" id="rating-max-value" value="10">
                     </div>
                     
                     <!-- Tipo -->
@@ -141,20 +171,20 @@
                             <!-- Países serão gerados dinamicamente -->
                         </select>
                     </div>
-                    
-                    <!-- Resultados por página -->
-                    <div class="col-md-3 mb-3">
-                        <label for="limit-filter" class="filter-label">Resultados por página</label>
-                        <select class="form-select" id="limit-filter">
-                            <option value="12" selected>12</option>
-                            <option value="24">24</option>
-                            <option value="48">48</option>
-                        </select>
-                    </div>
                 </div>
                 
                 <div class="row">
-                    <div class="col-12">
+                    <!-- Resultados por página (Botões) -->
+                    <div class="col-md-6 mb-3">
+                        <label class="filter-label d-block">Resultados por página</label>
+                        <div class="btn-group" role="group" aria-label="Resultados por página">
+                            <button type="button" class="btn btn-outline-secondary results-per-page-btn active" data-value="12">12</button>
+                            <button type="button" class="btn btn-outline-secondary results-per-page-btn" data-value="18">18</button>
+                            <button type="button" class="btn btn-outline-secondary results-per-page-btn" data-value="24">24</button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mt-4">
                         <button id="apply-filters" class="btn btn-primary">Aplicar filtros</button>
                     </div>
                 </div>
@@ -179,8 +209,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js"></script>
     <script>
-        // Configuração da API
         const API_URL = 'http://localhost:3000/api';
         let currentPage = 1;
         let totalPages = 1;
@@ -189,14 +219,14 @@
         let activeFilters = {
             genre: null,
             year: null,
-            rating: null,
+            minRating: 0,
+            maxRating: 10,
             type: null,
             country: null,
             sort: "imdb.rating:-1",
             limit: 12
         };
 
-        // Elementos DOM
         const moviesContainer = document.getElementById('movies-container');
         const noResultsElement = document.getElementById('no-results');
         const paginationContainer = document.getElementById('pagination');
@@ -205,17 +235,47 @@
         const searchForm = document.getElementById('search-form');
         const searchInput = document.getElementById('search-input');
         const genresContainer = document.getElementById('genres-container');
+        const genreDropdown = document.getElementById('genreDropdown');
         const yearFilter = document.getElementById('year-filter');
         const countryFilter = document.getElementById('country-filter');
         const typeFilter = document.getElementById('type-filter');
         const sortByFilter = document.getElementById('sort-by');
-        const limitFilter = document.getElementById('limit-filter');
+        const ratingMinValue = document.getElementById('rating-min-value');
+        const ratingMaxValue = document.getElementById('rating-max-value');
         const applyFiltersBtn = document.getElementById('apply-filters');
         const clearFiltersBtn = document.getElementById('clear-filters');
         const activeFiltersContainer = document.getElementById('active-filters');
-        const ratingButtons = document.querySelectorAll('#rating-filter button');
+        const resultsPerPageBtns = document.querySelectorAll('.results-per-page-btn');
 
         document.addEventListener('DOMContentLoaded', async () => {
+            const ratingSlider = document.getElementById('rating-slider');
+            if (ratingSlider) {
+                noUiSlider.create(ratingSlider, {
+                    start: [0, 10],
+                    connect: true,
+                    step: 0.5,
+                    range: {
+                        'min': 0,
+                        'max': 10
+                    },
+                    format: {
+                        to: function (value) {
+                            return value.toFixed(1);
+                        },
+                        from: function (value) {
+                            return parseFloat(value);
+                        }
+                    }
+                });
+
+                ratingSlider.noUiSlider.on('update', function (values, handle) {
+                    document.getElementById('rating-min').textContent = values[0];
+                    document.getElementById('rating-max').textContent = values[1];
+                    ratingMinValue.value = values[0];
+                    ratingMaxValue.value = values[1];
+                });
+            }
+
             await loadFilterOptions();
             
             const urlParams = new URLSearchParams(window.location.search);
@@ -224,21 +284,20 @@
             if (genreParam) {
                 activeFilters.genre = genreParam;
                 pageTitle.textContent = `Filmes do gênero: ${genreParam}`;
-                
-                setTimeout(() => {
-                    document.querySelectorAll('.genre-badge').forEach(badge => {
-                        if (badge.dataset.genre === genreParam) {
-                            badge.classList.add('active');
-                        }
-                    });
-                    
-                    clearFiltersBtn.style.display = 'inline-block';
-                    
-                    fetchMoviesWithFilters();
-                }, 500);
+                updateGenreDropdownText(genreParam);
+                clearFiltersBtn.style.display = 'inline-block';
+                fetchMoviesWithFilters();
             } else {
                 fetchMovies();
             }
+
+            resultsPerPageBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    resultsPerPageBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeFilters.limit = parseInt(btn.dataset.value);
+                });
+            });
         });
 
         searchForm.addEventListener('submit', (e) => {
@@ -253,6 +312,8 @@
 
         applyFiltersBtn.addEventListener('click', () => {
             currentPage = 1;
+            activeFilters.minRating = parseFloat(ratingMinValue.value);
+            activeFilters.maxRating = parseFloat(ratingMaxValue.value);
             fetchMoviesWithFilters();
         });
 
@@ -261,21 +322,8 @@
             fetchMovies();
         });
 
-        // Adicionar event listeners para os botões de classificação
-        ratingButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                ratingButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                activeFilters.rating = parseFloat(button.getAttribute('data-rating'));
-            });
-        });
-
         sortByFilter.addEventListener('change', () => {
             activeFilters.sort = sortByFilter.value;
-        });
-
-        limitFilter.addEventListener('change', () => {
-            activeFilters.limit = parseInt(limitFilter.value);
         });
 
         yearFilter.addEventListener('change', () => {
@@ -290,7 +338,6 @@
             activeFilters.country = countryFilter.value || null;
         });
 
-        // Funções de API
         async function fetchMovies(page = 1, limit = 12) {
             showLoading();
             try {
@@ -320,7 +367,10 @@
             
             if (activeFilters.genre) params.append('genre', activeFilters.genre);
             if (activeFilters.year) params.append('year', activeFilters.year);
-            if (activeFilters.rating) params.append('min_rating', activeFilters.rating);
+            if (activeFilters.minRating > 0) params.append('min_rating', activeFilters.minRating);
+            if (activeFilters.maxRating < 10) {
+                params.append('min_rating', activeFilters.minRating);
+            }
             if (activeFilters.type) params.append('type', activeFilters.type);
             if (activeFilters.country) params.append('country', activeFilters.country);
             
@@ -335,7 +385,14 @@
                 const data = await response.json();
                 
                 if (data.movies && data.movies.length > 0) {
-                    renderMovies(data.movies);
+                    let filteredMovies = data.movies;
+                    if (activeFilters.maxRating < 10) {
+                        filteredMovies = data.movies.filter(movie => 
+                            movie.imdb?.rating <= activeFilters.maxRating
+                        );
+                    }
+                    
+                    renderMovies(filteredMovies);
                     currentPage = data.currentPage || 1;
                     totalPages = data.totalPages || 1;
                     renderPagination();
@@ -358,7 +415,7 @@
                 
                 if (movies && movies.length > 0) {
                     renderMovies(movies);
-                    paginationContainer.innerHTML = ''; // Sem paginação para resultados de busca
+                    paginationContainer.innerHTML = '';
                 } else {
                     showNoResults();
                 }
@@ -372,17 +429,14 @@
 
         async function loadFilterOptions() {
             try {
-                // Obter todos os gêneros
                 const genresResponse = await fetch(`${API_URL}/movies/genres`);
                 allGenres = await genresResponse.json();
-                renderGenresFilter(allGenres);
+                renderGenresDropdown(allGenres);
                 
-                // Obter todos os países
                 const countriesResponse = await fetch(`${API_URL}/movies/countries`);
                 allCountries = await countriesResponse.json();
                 renderCountriesFilter(allCountries);
                 
-                // Gerar opções de anos (de 1900 até o ano atual)
                 renderYearsFilter();
                 
             } catch (error) {
@@ -390,7 +444,6 @@
             }
         }
 
-        // Funções de Renderização
         function renderMovies(movies) {
             if (!movies || movies.length === 0) {
                 showNoResults();
@@ -425,31 +478,49 @@
             });
         }
 
-        function renderGenresFilter(genres) {
-            genresContainer.innerHTML = '';
+        function renderGenresDropdown(genres) {
+            genresContainer.innerHTML = '<li><a class="dropdown-item" href="#" data-genre="">Todos os gêneros</a></li>';
             
             genres.forEach(genre => {
-                const badge = document.createElement('span');
-                badge.className = 'badge bg-light text-dark genre-badge';
-                badge.textContent = genre;
-                badge.dataset.genre = genre;
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.className = 'dropdown-item';
+                link.href = '#';
+                link.textContent = genre;
+                link.dataset.genre = genre;
                 
-                badge.addEventListener('click', () => {
-                    // Toggle active class
-                    document.querySelectorAll('.genre-badge').forEach(b => b.classList.remove('active'));
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('#genres-container .dropdown-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
                     
                     if (activeFilters.genre === genre) {
-                        // Desativar filtro se já estava ativo
                         activeFilters.genre = null;
+                        genreDropdown.textContent = 'Selecionar gênero';
                     } else {
-                        // Ativar filtro
-                        badge.classList.add('active');
+                        link.classList.add('active');
                         activeFilters.genre = genre;
+                        genreDropdown.textContent = genre;
                     }
                 });
                 
-                genresContainer.appendChild(badge);
+                listItem.appendChild(link);
+                genresContainer.appendChild(listItem);
             });
+        }
+
+        function updateGenreDropdownText(genre) {
+            if (genre) {
+                genreDropdown.textContent = genre;
+                document.querySelectorAll('#genres-container .dropdown-item').forEach(item => {
+                    if (item.dataset.genre === genre) {
+                        item.classList.add('active');
+                    }
+                });
+            } else {
+                genreDropdown.textContent = 'Selecionar gênero';
+            }
         }
 
         function renderCountriesFilter(countries) {
@@ -492,7 +563,7 @@
                 if (page) {
                     a.addEventListener('click', (e) => {
                         e.preventDefault();
-                        if (Object.values(activeFilters).some(val => val !== null)) {
+                        if (Object.values(activeFilters).some(val => val !== null && val !== 0 && val !== 10)) {
                             fetchMoviesWithFilters(page);
                         } else {
                             fetchMovies(page, activeFilters.limit);
@@ -507,10 +578,8 @@
             const ul = document.createElement('ul');
             ul.className = 'pagination';
             
-            // Botão anterior
             ul.appendChild(createPageButton(currentPage > 1 ? currentPage - 1 : null, 'Anterior', false));
             
-            // Páginas
             const startPage = Math.max(1, currentPage - 2);
             const endPage = Math.min(totalPages, currentPage + 2);
             
@@ -518,7 +587,6 @@
                 ul.appendChild(createPageButton(i, i.toString(), i === currentPage));
             }
             
-            // Botão próximo
             ul.appendChild(createPageButton(currentPage < totalPages ? currentPage + 1 : null, 'Próximo', false));
             
             paginationContainer.appendChild(ul);
@@ -528,11 +596,10 @@
             activeFiltersContainer.innerHTML = '';
             let hasActiveFilters = false;
             
-            // Criar badges para cada filtro ativo
             if (activeFilters.genre) {
                 createFilterBadge('Gênero', activeFilters.genre, () => {
                     activeFilters.genre = null;
-                    document.querySelectorAll('.genre-badge').forEach(b => b.classList.remove('active'));
+                    updateGenreDropdownText(null);
                     fetchMoviesWithFilters();
                 });
                 hasActiveFilters = true;
@@ -547,10 +614,12 @@
                 hasActiveFilters = true;
             }
             
-            if (activeFilters.rating) {
-                createFilterBadge('Classificação', `${activeFilters.rating}+ ⭐`, () => {
-                    activeFilters.rating = null;
-                    ratingButtons.forEach(btn => btn.classList.remove('active'));
+            if (activeFilters.minRating > 0 || activeFilters.maxRating < 10) {
+                createFilterBadge('Classificação', `${activeFilters.minRating} - ${activeFilters.maxRating} ⭐`, () => {
+                    const ratingSlider = document.getElementById('rating-slider');
+                    ratingSlider.noUiSlider.set([0, 10]);
+                    activeFilters.minRating = 0;
+                    activeFilters.maxRating = 10;
                     fetchMoviesWithFilters();
                 });
                 hasActiveFilters = true;
@@ -598,12 +667,20 @@
 
         function clearActiveFilters() {
             activeFiltersContainer.innerHTML = '';
-            document.querySelectorAll('.genre-badge').forEach(b => b.classList.remove('active'));
-            ratingButtons.forEach(btn => btn.classList.remove('active'));
+            updateGenreDropdownText(null);
+            
+            const ratingSlider = document.getElementById('rating-slider');
+            if (ratingSlider && ratingSlider.noUiSlider) {
+                ratingSlider.noUiSlider.set([0, 10]);
+            }
             
             yearFilter.value = '';
             typeFilter.value = '';
             countryFilter.value = '';
+            
+            document.querySelectorAll('.results-per-page-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === 0);
+            });
             
             clearFiltersBtn.style.display = 'none';
         }
@@ -611,24 +688,21 @@
         function clearAllFilters() {
             clearActiveFilters();
             
-            // Reset todos os filtros
             activeFilters = {
                 genre: null,
                 year: null,
-                rating: null,
+                minRating: 0,
+                maxRating: 10,
                 type: null,
                 country: null,
                 sort: "imdb.rating:-1",
                 limit: 12
             };
             
-            // Reset UI
             sortByFilter.value = "imdb.rating:-1";
-            limitFilter.value = "12";
             pageTitle.textContent = "Filmes";
         }
 
-        // Funções de utilidade
         function showLoading() {
             loadingElement.style.display = 'block';
             moviesContainer.style.display = 'none';
