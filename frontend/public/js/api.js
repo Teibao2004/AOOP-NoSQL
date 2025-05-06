@@ -1,5 +1,5 @@
 // Configuração da API
-const API_URL = 'https://aoop-nosql28991-backend.onrender.com/api';
+const API_URL = 'https://aoop-nosql-backend.onrender.com/api';
 
 // Funções para operações de API comuns
 const API = {
