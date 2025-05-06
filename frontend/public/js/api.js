@@ -1,9 +1,8 @@
 // Configuração da API
-const API_URL = process.env.BACKEND_URL || 'http://localhost:3000/api';
+const API_URL = 'https://aoop-nosql28991.onrender.com/api';
 
 // Funções para operações de API comuns
 const API = {
-  // Filmes
   getMovies: async (page = 1, limit = 12) => {
     const response = await fetch(`${API_URL}/movies?page=${page}&limit=${limit}`);
     return await response.json();
@@ -25,7 +24,6 @@ const API = {
       limit: filters.limit || 12
     });
     
-    // Adicionar filtros à query string
     if (filters.genre) params.append('genre', filters.genre);
     if (filters.year) params.append('year', filters.year);
     if (filters.minRating > 0) params.append('min_rating', filters.minRating);
