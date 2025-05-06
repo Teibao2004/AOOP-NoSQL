@@ -1,8 +1,8 @@
   import express from 'express';
   import cors from 'cors';
   import dotenv from 'dotenv';
-  import routes from './backend/routes/routes.js';
-  import connectDB from './backend/config/database.js';
+  import routes from './routes/routes.js';
+  import connectDB from './config/database.js';
 
   dotenv.config();
   connectDB();
@@ -16,7 +16,7 @@
     credentials: true,
   }));
 
-  app.use(express.static('public'));
+  // app.use(express.static('public'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
