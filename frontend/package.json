@@ -1,0 +1,17 @@
+{
+    "name": "trabalho-mongodb-frontend",
+    "version": "1.0.0",
+    "description": "Frontend API para aplicação de NoSQL para AOOP",
+    "main": "index.html",
+    "scripts": {
+      "start": "serve -s public"
+    },
+    "dependencies": {
+      "serve": "^14.2.1"
+    },
+    "devDependencies": {},
+    "engines": {
+      "node": ">=16.0.0"
+    }
+  }
+  
