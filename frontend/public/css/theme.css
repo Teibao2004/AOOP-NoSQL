@@ -1,0 +1,399 @@
+/* Variáveis para o sistema de cores */
+:root {
+    --light-bg: #f8f9fa;
+    --light-text: #212529;
+    --light-primary: #0d6efd;
+    --light-secondary: #6c757d;
+    --light-border: #dee2e6;
+    --light-card-bg: #ffffff;
+    --light-hover: #e9ecef;
+    
+    --dark-bg: #121212;
+    --dark-card-bg: #1e1e1e;
+    --dark-secondary-bg: #2d2d2d;
+    --dark-text: #e0e0e0;
+    --dark-primary: #4d94ff;
+    --dark-secondary: #909090;
+    --dark-border: #404040;
+    --dark-hover: #333333;
+    
+    --transition-speed: 0.3s;
+}
+
+body {
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    background-color: var(--light-bg);
+    color: var(--light-text);
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* Estilos gerais */
+.container {
+    transition: background-color var(--transition-speed);
+}
+
+/* Cards de filmes */
+.movie-card {
+    height: 100%;
+    transition: transform 0.3s, box-shadow 0.3s, background-color var(--transition-speed);
+    background-color: var(--light-card-bg);
+    border: 1px solid var(--light-border);
+}
+
+.dark-mode .movie-card {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+.movie-card:hover {
+    transform: scale(105%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .movie-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.movie-poster {
+    height: 450px;
+    object-fit: cover;
+}
+
+.card-title, .card-text {
+    transition: color var(--transition-speed);
+}
+
+.dark-mode .card-title, .dark-mode .card-text {
+    color: var(--dark-text);
+}
+
+.votos {
+    color: var(--light-secondary);
+    font-size: 12px;
+    transition: color var(--transition-speed);
+}
+
+.dark-mode .votos {
+    color: var(--dark-secondary);
+}
+
+/* Filtros */
+.filters-container {
+    background-color: var(--light-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--light-border);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dark-mode .filters-container {
+    background-color: var(--dark-secondary-bg);
+    border-color: var(--dark-border);
+}
+
+.filter-label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    transition: color var(--transition-speed);
+}
+
+.dark-mode .filter-label {
+    color: var(--dark-text);
+}
+
+#movies-container {
+    min-height: 400px;
+}
+
+#no-results {
+    display: none;
+    transition: color var(--transition-speed);
+}
+
+.dark-mode #no-results {
+    color: var(--dark-text);
+}
+
+/* Dropdown e seletores */
+.form-select, .form-control, .btn-outline-secondary {
+    transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dark-mode .form-select, .dark-mode .form-control {
+    background-color: var(--dark-secondary-bg);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.dark-mode .btn-outline-secondary {
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.dark-mode .btn-outline-secondary:hover {
+    background-color: var(--dark-hover);
+}
+
+.genre-dropdown {
+    max-height: 300px;
+    overflow-y: auto;
+    transition: background-color var(--transition-speed);
+}
+
+.dark-mode .dropdown-menu {
+    background-color: var(--dark-secondary-bg);
+    border-color: var(--dark-border);
+}
+
+.dark-mode .dropdown-item {
+    color: var(--dark-text);
+}
+
+.dark-mode .dropdown-item:hover {
+    background-color: var(--dark-hover);
+}
+
+.dropdown-item.active {
+    background-color: var(--light-primary);
+    color: white;
+}
+
+.dark-mode .dropdown-item.active {
+    background-color: var(--dark-primary);
+}
+
+/* Slider de classificação */
+.rating-slider {
+    margin: 30px 10px;
+}
+
+.rating-values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    transition: color var(--transition-speed);
+}
+
+.dark-mode .rating-values {
+    color: var(--dark-text);
+}
+
+/* Botões de resultados por página */
+.results-per-page-btn {
+    border-radius: 0;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.results-per-page-btn.active {
+    background-color: var(--light-primary);
+    color: white;
+}
+
+.dark-mode .results-per-page-btn.active {
+    background-color: var(--dark-primary);
+}
+
+.results-per-page-btn:first-child {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.results-per-page-btn:last-child {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Navbar */
+.navbar {
+    transition: background-color var(--transition-speed);
+}
+
+.dark-mode .navbar {
+    background-color: var(--dark-secondary-bg) !important;
+}
+
+/* Paginação */
+.page-link {
+    transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dark-mode .page-link {
+    background-color: var(--dark-secondary-bg);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.dark-mode .page-item.active .page-link {
+    background-color: var(--dark-primary);
+    border-color: var(--dark-primary);
+}
+
+/* Toggle de modo escuro */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--light-primary);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.dark-mode .theme-toggle {
+    background-color: var(--dark-primary);
+}
+
+.theme-toggle i {
+    font-size: 1.5rem;
+    transition: transform 0.5s;
+}
+
+.dark-mode .theme-toggle .fa-sun {
+    display: block;
+}
+
+.dark-mode .theme-toggle .fa-moon {
+    display: none;
+}
+
+.theme-toggle .fa-sun {
+    display: none;
+}
+
+.theme-toggle .fa-moon {
+    display: block;
+}
+
+/* Animação quando troca de tema */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.theme-animate {
+    animation: spin 0.5s ease-in-out;
+}
+
+/* Estilização dos modals para modo escuro */
+.dark-mode .modal-content {
+    background-color: var(--dark-secondary-bg);
+    color: var(--dark-text);
+    border-color: var(--dark-border);
+}
+
+.dark-mode .modal-header, .dark-mode .modal-footer {
+    border-color: var(--dark-border);
+}
+
+.dark-mode .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Detalhes do filme */
+.movie-poster {
+    max-height: 500px;
+    object-fit: cover;
+}
+
+.comment-card {
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--light-primary);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dark-mode .comment-card {
+    background-color: var(--dark-card-bg);
+    border-left-color: var(--dark-primary);
+}
+
+.comment-form {
+    background-color: var(--light-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    transition: background-color var(--transition-speed);
+}
+
+.dark-mode .comment-form {
+    background-color: var(--dark-secondary-bg);
+}
+
+.rating-badge {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    transition: background-color var(--transition-speed);
+}
+
+.dark-mode .rating-badge {
+    background-color: var(--dark-primary) !important;
+}
+
+.genre-badge {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: background-color var(--transition-speed);
+}
+
+.dark-mode .genre-badge {
+    background-color: var(--dark-secondary-bg);
+    color: var(--dark-text);
+}
+
+.back-button {
+    margin-bottom: 1rem;
+    transition: color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dark-mode .back-button {
+    color: var(--dark-primary);
+    border-color: var(--dark-primary);
+}
+
+.dark-mode .back-button:hover {
+    background-color: var(--dark-primary);
+    color: white;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: var(--light-secondary);
+    transition: color var(--transition-speed);
+}
+
+.dark-mode .comment-date {
+    color: var(--dark-secondary);
+}
+
+.comment-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-comment-form {
+    display: none;
+    margin-top: 10px;
+}

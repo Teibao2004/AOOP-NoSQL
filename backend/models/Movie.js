@@ -21,9 +21,7 @@ const movieSchema = new mongoose.Schema({
     id: Number
   }
 }, {
-  // Para manter a compatibilidade com o nome da coleção no MongoDB
   collection: 'movies',
-  // Para permitir campos adicionais que podem existir nos documentos
   strict: false
 });
 
