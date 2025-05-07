@@ -6,6 +6,7 @@ let currentPage = 1;
 let totalPages = 1;
 let allGenres = [];
 let allCountries = [];
+let isSearchMode = false;
 
 // Definição inicial dos filtros ativos
 let activeFilters = {
@@ -95,11 +96,37 @@ searchForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const query = searchInput.value.trim();
     if (query) {
+        isSearchMode = true;
         pageTitle.textContent = `Resultados para: "${query}"`;
         searchMovies(query);
         clearActiveFilters();
+        
+        // Adicionar botão de voltar
+        showBackButton();
     }
 });
+
+// Função para mostrar o botão de voltar após pesquisa
+function showBackButton() {
+    const existingButton = document.getElementById('back-to-home');
+    if (!existingButton) {
+        const backButton = document.createElement('button');
+        backButton.id = 'back-to-home';
+        backButton.className = 'btn btn-outline-primary mb-3';
+        backButton.innerHTML = '<i class="fas fa-arrow-left"></i> Voltar aos filmes';
+        backButton.addEventListener('click', () => {
+            isSearchMode = false;
+            searchInput.value = '';
+            pageTitle.textContent = "Filmes";
+            clearAllFilters();
+            fetchMovies();
+            backButton.remove();
+        });
+        
+        // Inserir antes da área de filtros ativos
+        activeFiltersContainer.parentNode.insertBefore(backButton, activeFiltersContainer);
+    }
+}
 
 // Aplica os filtros
 applyFiltersBtn.addEventListener('click', () => {
@@ -522,6 +549,12 @@ function clearAllFilters() {
     
     sortByFilter.value = "imdb.rating:-1";
     pageTitle.textContent = "Filmes";
+    
+    // Remover botão de voltar se existir
+    const backButton = document.getElementById('back-to-home');
+    if (backButton) {
+        backButton.remove();
+    }
 }
 
 function showLoading() {
