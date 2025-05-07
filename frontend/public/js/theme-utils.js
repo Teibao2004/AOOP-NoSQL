@@ -30,7 +30,7 @@ function addThemeToggle() {
     });
 }
 
-// Função para corrigir o comportamento de navegação após pesquisa
+// Função corrigida para lidar com pesquisa e navegação
 function fixSearchNavigation() {
     const searchForm = document.getElementById('search-form');
     if (searchForm) {
@@ -42,17 +42,37 @@ function fixSearchNavigation() {
             
             // Adicionar termo de pesquisa à URL como parâmetro de consulta
             const currentUrl = new URL(window.location.href);
+            
+            // Antes de fazer qualquer coisa, vamos guardar o estado anterior
+            const previousState = { 
+                query: currentUrl.searchParams.get('search'),
+                page: currentUrl.searchParams.get('page') || '1',
+                filters: getActiveFiltersFromUI()
+            };
+            
+            // Agora atualizar a URL com o termo de pesquisa
             if (searchTerm) {
                 currentUrl.searchParams.set('search', searchTerm);
+                // Reiniciar a página para 1 quando realizar uma nova pesquisa
+                currentUrl.searchParams.set('page', '1');
+                // Limpar outros filtros da URL quando pesquisando
+                ['genre', 'year', 'minRating', 'maxRating', 'type', 'country'].forEach(filter => {
+                    currentUrl.searchParams.delete(filter);
+                });
             } else {
                 currentUrl.searchParams.delete('search');
             }
             
-            // Usar history.pushState para atualizar a URL sem recarregar a página
-            history.pushState({}, '', currentUrl);
+            // Usar history.pushState para adicionar o estado anterior ao histórico
+            history.pushState(previousState, '', currentUrl);
             
-            // Executar a pesquisa (chame a função apropriada aqui)
-            loadMovies(1); // Assumindo que você tem uma função loadMovies
+            // Executar a pesquisa
+            if (typeof searchMovies === 'function') {
+                searchMovies(searchTerm);
+            } else if (typeof fetchMovies === 'function') {
+                // Fallback para a função fetchMovies
+                fetchMovies(1);
+            }
         });
         
         // Verificar se há um termo de pesquisa na URL ao carregar a página
@@ -63,24 +83,158 @@ function fixSearchNavigation() {
             if (searchTerm) {
                 document.getElementById('search-input').value = searchTerm;
                 // Executar pesquisa com o termo da URL
-                loadMovies(1);
+                if (typeof searchMovies === 'function') {
+                    searchMovies(searchTerm);
+                }
             }
         });
         
         // Suporte para botão voltar do navegador
-        window.addEventListener('popstate', function() {
+        window.addEventListener('popstate', function(event) {
             const urlParams = new URLSearchParams(window.location.search);
             const searchTerm = urlParams.get('search');
             
-            if (searchTerm) {
-                document.getElementById('search-input').value = searchTerm;
+            // Reconfigurar a UI com base no estado anterior
+            if (event.state) {
+                // Se temos um estado salvo, usamos ele
+                restoreStateToUI(event.state);
             } else {
-                document.getElementById('search-input').value = '';
+                // Caso contrário, apenas atualizamos o campo de pesquisa
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.value = searchTerm || '';
+                }
+                
+                // Recarregar filmes baseado nos parâmetros atuais da URL
+                const page = urlParams.get('page') || '1';
+                
+                if (searchTerm && typeof searchMovies === 'function') {
+                    searchMovies(searchTerm);
+                } else if (typeof fetchMovies === 'function') {
+                    fetchMovies(parseInt(page));
+                }
             }
-            
-            // Recarregar filmes baseado no estado atual da URL
-            loadMovies(1);
         });
+    }
+}
+
+// Função para obter os filtros ativos da interface
+function getActiveFiltersFromUI() {
+    const filters = {};
+    
+    // Obter filtros básicos
+    const genreElement = document.getElementById('genreDropdown');
+    if (genreElement && genreElement.textContent !== 'Selecionar género') {
+        filters.genre = genreElement.textContent.trim();
+    }
+    
+    const yearElement = document.getElementById('year-filter');
+    if (yearElement && yearElement.value) {
+        filters.year = yearElement.value;
+    }
+    
+    const typeElement = document.getElementById('type-filter');
+    if (typeElement && typeElement.value) {
+        filters.type = typeElement.value;
+    }
+    
+    const countryElement = document.getElementById('country-filter');
+    if (countryElement && countryElement.value) {
+        filters.country = countryElement.value;
+    }
+    
+    // Obter classificações
+    const minRatingElement = document.getElementById('rating-min-value');
+    const maxRatingElement = document.getElementById('rating-max-value');
+    if (minRatingElement && maxRatingElement) {
+        filters.minRating = minRatingElement.value;
+        filters.maxRating = maxRatingElement.value;
+    }
+    
+    // Ordenação
+    const sortElement = document.getElementById('sort-by');
+    if (sortElement) {
+        filters.sort = sortElement.value;
+    }
+    
+    return filters;
+}
+
+// Função para restaurar o estado da UI a partir de um estado salvo
+function restoreStateToUI(state) {
+    // Restaurar campo de pesquisa
+    const searchInput = document.getElementById('search-input');
+    if (searchInput && state.query) {
+        searchInput.value = state.query;
+    }
+    
+    // Restaurar filtros se disponíveis no estado
+    if (state.filters) {
+        // Restaurar gênero
+        if (state.filters.genre) {
+            const genreElement = document.getElementById('genreDropdown');
+            if (genreElement) {
+                genreElement.textContent = state.filters.genre;
+                
+                // Atualizar também o item ativo no dropdown
+                const genreItems = document.querySelectorAll('#genres-container .dropdown-item');
+                genreItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.genre === state.filters.genre);
+                });
+            }
+        }
+        
+        // Restaurar ano
+        if (state.filters.year) {
+            const yearElement = document.getElementById('year-filter');
+            if (yearElement) {
+                yearElement.value = state.filters.year;
+            }
+        }
+        
+        // Restaurar tipo
+        if (state.filters.type) {
+            const typeElement = document.getElementById('type-filter');
+            if (typeElement) {
+                typeElement.value = state.filters.type;
+            }
+        }
+        
+        // Restaurar país
+        if (state.filters.country) {
+            const countryElement = document.getElementById('country-filter');
+            if (countryElement) {
+                countryElement.value = state.filters.country;
+            }
+        }
+        
+        // Restaurar classificações
+        if (state.filters.minRating && state.filters.maxRating) {
+            const ratingSlider = document.getElementById('rating-slider');
+            if (ratingSlider && ratingSlider.noUiSlider) {
+                ratingSlider.noUiSlider.set([
+                    parseFloat(state.filters.minRating),
+                    parseFloat(state.filters.maxRating)
+                ]);
+            }
+        }
+        
+        // Restaurar ordenação
+        if (state.filters.sort) {
+            const sortElement = document.getElementById('sort-by');
+            if (sortElement) {
+                sortElement.value = state.filters.sort;
+            }
+        }
+    }
+    
+    // Recarregar filmes com os filtros restaurados
+    if (state.query && typeof searchMovies === 'function') {
+        searchMovies(state.query);
+    } else if (typeof fetchMovies === 'function') {
+        fetchMovies(parseInt(state.page || '1'));
+    } else if (typeof fetchMoviesWithFilters === 'function') {
+        fetchMoviesWithFilters(parseInt(state.page || '1'));
     }
 }
 

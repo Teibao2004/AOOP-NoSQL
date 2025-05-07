@@ -1,21 +1,23 @@
-/* Variáveis para o sistema de cores */
+/* Variáveis para o sistema de cores neutras */
 :root {
-    --light-bg: #f8f9fa;
-    --light-text: #212529;
-    --light-primary: #0d6efd;
-    --light-secondary: #6c757d;
-    --light-border: #dee2e6;
+    /* Modo claro - Cores neutras */
+    --light-bg: #f5f5f5;
+    --light-text: #333333;
+    --light-primary: #555555;
+    --light-secondary: #777777;
+    --light-border: #dddddd;
     --light-card-bg: #ffffff;
-    --light-hover: #e9ecef;
+    --light-hover: #e9e9e9;
     
-    --dark-bg: #121212;
-    --dark-card-bg: #1e1e1e;
-    --dark-secondary-bg: #2d2d2d;
+    /* Modo escuro - Cores neutras */
+    --dark-bg: #1a1a1a;
+    --dark-card-bg: #2a2a2a;
+    --dark-secondary-bg: #333333;
     --dark-text: #e0e0e0;
-    --dark-primary: #4d94ff;
-    --dark-secondary: #909090;
-    --dark-border: #404040;
-    --dark-hover: #333333;
+    --dark-primary: #aaaaaa;
+    --dark-secondary: #888888;
+    --dark-border: #444444;
+    --dark-hover: #3a3a3a;
     
     --transition-speed: 0.3s;
 }
@@ -52,11 +54,11 @@ body.dark-mode {
 
 .movie-card:hover {
     transform: scale(105%);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .dark-mode .movie-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .movie-poster {
@@ -166,6 +168,7 @@ body.dark-mode {
 
 .dark-mode .dropdown-item.active {
     background-color: var(--dark-primary);
+    color: var(--dark-bg);
 }
 
 /* Slider de classificação */
@@ -197,6 +200,7 @@ body.dark-mode {
 
 .dark-mode .results-per-page-btn.active {
     background-color: var(--dark-primary);
+    color: var(--dark-bg);
 }
 
 .results-per-page-btn:first-child {
@@ -217,16 +221,26 @@ body.dark-mode {
 
 /* Navbar */
 .navbar {
-    transition: background-color var(--transition-speed);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+    background-color: var(--light-primary) !important;
 }
 
 .dark-mode .navbar {
     background-color: var(--dark-secondary-bg) !important;
 }
 
+.navbar-brand, .navbar-dark .navbar-brand {
+    color: #ffffff;
+}
+
+.dark-mode .navbar-brand, .dark-mode .navbar-dark .navbar-brand {
+    color: var(--dark-text);
+}
+
 /* Paginação */
 .page-link {
     transition: background-color var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
+    color: var(--light-primary);
 }
 
 .dark-mode .page-link {
@@ -235,9 +249,16 @@ body.dark-mode {
     border-color: var(--dark-border);
 }
 
+.page-item.active .page-link {
+    background-color: var(--light-primary);
+    border-color: var(--light-primary);
+    color: white;
+}
+
 .dark-mode .page-item.active .page-link {
     background-color: var(--dark-primary);
     border-color: var(--dark-primary);
+    color: var(--dark-bg);
 }
 
 /* Toggle de modo escuro */
@@ -266,6 +287,7 @@ body.dark-mode {
 
 .dark-mode .theme-toggle {
     background-color: var(--dark-primary);
+    color: var(--dark-bg);
 }
 
 .theme-toggle i {
@@ -345,17 +367,22 @@ body.dark-mode {
 .rating-badge {
     font-size: 1.2rem;
     padding: 0.5rem 1rem;
-    transition: background-color var(--transition-speed);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    background-color: #ddd !important;
+    color: var(--light-text) !important;
 }
 
 .dark-mode .rating-badge {
     background-color: var(--dark-primary) !important;
+    color: var(--dark-bg) !important;
 }
 
 .genre-badge {
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
-    transition: background-color var(--transition-speed);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    background-color: #ddd;
+    color: var(--light-text);
 }
 
 .dark-mode .genre-badge {
@@ -365,7 +392,9 @@ body.dark-mode {
 
 .back-button {
     margin-bottom: 1rem;
-    transition: color var(--transition-speed), border-color var(--transition-speed);
+    transition: color var(--transition-speed), border-color var(--transition-speed), background-color var(--transition-speed);
+    color: var(--light-primary);
+    border-color: var(--light-primary);
 }
 
 .dark-mode .back-button {
@@ -375,7 +404,7 @@ body.dark-mode {
 
 .dark-mode .back-button:hover {
     background-color: var(--dark-primary);
-    color: white;
+    color: var(--dark-bg);
 }
 
 .comment-date {
@@ -396,4 +425,58 @@ body.dark-mode {
 .edit-comment-form {
     display: none;
     margin-top: 10px;
+}
+
+/* Botões e badges específicos */
+.btn-primary {
+    background-color: var(--light-primary);
+    border-color: var(--light-primary);
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.dark-mode .btn-primary {
+    background-color: var(--dark-primary);
+    border-color: var(--dark-primary);
+    color: var(--dark-bg);
+}
+
+.btn-outline-primary {
+    color: var(--light-primary);
+    border-color: var(--light-primary);
+}
+
+.dark-mode .btn-outline-primary {
+    color: var(--dark-primary);
+    border-color: var(--dark-primary);
+}
+
+.dark-mode .btn-outline-primary:hover {
+    background-color: var(--dark-primary);
+    color: var(--dark-bg);
+}
+
+.badge.bg-warning {
+    background-color: #ddd !important;
+    color: var(--light-text) !important;
+}
+
+.dark-mode .badge.bg-warning {
+    background-color: var(--dark-primary) !important;
+    color: var(--dark-bg) !important;
+}
+
+/* Corrigindo cor dos botões de pesquisa */
+.btn-outline-light {
+    color: #fff;
+    border-color: #fff;
+}
+
+.dark-mode .btn-outline-light {
+    color: var(--dark-text);
+    border-color: var(--dark-text);
+}
+
+.dark-mode .btn-outline-light:hover {
+    background-color: var(--dark-text);
+    color: var(--dark-bg);
 }
