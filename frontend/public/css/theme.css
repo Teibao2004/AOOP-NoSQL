@@ -572,3 +572,7 @@ body.dark-mode {
     background-color: var(--dark-text);
     color: var(--dark-bg);
 }
+
+.dark-mode input::placeholder {
+    color: var(--dark-text) !important;
+}
