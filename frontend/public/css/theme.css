@@ -520,7 +520,7 @@ body.dark-mode {
 }
 
 .btn-detalhes:active {
-    background-color: var(--dark-hover);
+    background-color: var(--dark-hover) !important;
 }
 
 .btn-primary {
@@ -547,9 +547,9 @@ body.dark-mode {
 }
 
 .btn-outline-primary:active {
-    background-color: var(--light-primary);
-    color: white;
-    border-color: var(--light-primary);
+    background-color: var(--light-primary) !important;
+    color: white !important;
+    border-color: var(--light-primary) !important;
 }
 
 .dark-mode .btn-outline-primary {
