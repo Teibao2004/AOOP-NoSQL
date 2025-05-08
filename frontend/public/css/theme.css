@@ -515,24 +515,24 @@ body.dark-mode {
 }
 
 /* Botões e badges específicos */
+.btn-detalhes {
+    background-color: var(--dark-hover) !important;
+    border-color: var(--dark-hover) !important;
+}
+
 .btn-detalhes:hover {
     background-color: var(--dark-hover);
-}
-
-.btn-modal:active {
-    background-color: var(--dark-hover) !important;
-    border-color: var(--dark-hover) !important;
-}
-
-.btn-detalhes:active {
-    background-color: var(--dark-hover) !important;
-    border-color: var(--dark-hover) !important;
 }
 
 .btn-primary {
     background-color: var(--light-primary);
     border-color: var(--light-primary);
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
+}
+
+.btn-primary:active {
+    background-color: var(--dark-hover) !important;
+    border-color: var(--dark-hover) !important;
 }
 
 .dark-mode .btn-primary {
