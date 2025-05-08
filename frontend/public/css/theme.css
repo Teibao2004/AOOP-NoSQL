@@ -519,6 +519,11 @@ body.dark-mode {
     background-color: var(--dark-hover);
 }
 
+.btn-modal:active {
+    background-color: var(--dark-hover) !important;
+    border-color: var(--dark-hover) !important;
+}
+
 .btn-detalhes:active {
     background-color: var(--dark-hover) !important;
     border-color: var(--dark-hover) !important;
