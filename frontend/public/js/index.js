@@ -277,14 +277,14 @@ function renderMovies(movies) {
         const movieElement = document.createElement('div');
         movieElement.className = 'col';
         movieElement.innerHTML = `
-            <div class="card movie-card">
+            <div class="card movie-card" data-id="${movie._id}" onclick="goToDetails(this)">
                 <img src="${posterUrl}" class="card-img-top movie-poster" alt="${movie.title}" onerror="this.onerror=null; this.src='assets/sem-poster.gif';">
                 <div class="card-body">
                     <h5 class="card-title nowrap">${movie.title}</h5>
                     <p class="card-text">${movie.year || 'Ano desconhecido'}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="badge bg-warning text-dark">⭐ ${rating}</span>
-                        <a href="movie-details.html?id=${movie._id}" class="btn btn-sm btn-detalhes btn-primary">Ver detalhes</a>
+                        <button class="btn btn-sm btn-detalhes btn-primary">Ver detalhes</button>
                     </div>
                 </div>
             </div>
@@ -292,6 +292,13 @@ function renderMovies(movies) {
         
         moviesContainer.appendChild(movieElement);
     });
+}
+
+function goToDetails(card) { 
+    const id = card.dataset.id; 
+    if (id) { 
+        window.location.href = `movie-details.html?id=${id}`; 
+    } 
 }
 
 // Renderiza o dropdown de géneros
