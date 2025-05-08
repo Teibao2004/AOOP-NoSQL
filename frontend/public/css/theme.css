@@ -525,8 +525,8 @@ body.dark-mode {
 }
 
 .btn-primary {
-    background-color: var(--light-primary);
-    border-color: var(--light-primary);
+    background-color: var(--light-primary) !important;
+    border-color: var(--light-primary) !important;
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
 }
 
