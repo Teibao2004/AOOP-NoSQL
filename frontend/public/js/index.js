@@ -281,7 +281,7 @@ function renderMovies(movies) {
                 <img src="${posterUrl}" class="card-img-top movie-poster" alt="${movie.title}" onerror="this.onerror=null; this.src='assets/sem-poster.gif';">
                 <div class="card-body">
                     <h5 class="card-title nowrap">${movie.title}</h5>
-                    <p class="card-text text-muted">${movie.year || 'Ano desconhecido'}</p>
+                    <p class="card-text">${movie.year || 'Ano desconhecido'}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="badge bg-warning text-dark">⭐ ${rating}</span>
                         <a href="movie-details.html?id=${movie._id}" class="btn btn-sm btn-primary">Ver detalhes</a>

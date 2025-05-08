@@ -397,6 +397,11 @@ body.dark-mode {
     border-color: var(--light-primary);
 }
 
+.back-button:hover {
+    background-color: var(--light-primary);
+    color: var(--light-bg);
+}
+
 .dark-mode .back-button {
     color: var(--dark-primary);
     border-color: var(--dark-primary);
