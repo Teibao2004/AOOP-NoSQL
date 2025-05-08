@@ -506,7 +506,7 @@ function updateActiveFiltersDisplay() {
 
 function createFilterBadge(label, value, removeCallback) {
     const badge = document.createElement('span');
-    badge.className = 'badge bg-primary me-2 mb-2';
+    badge.className = 'badge bg-secondary me-2 mb-2';
     badge.innerHTML = `${label}: ${value} <i class="fas fa-times ms-1" style="cursor: pointer;"></i>`;
     
     badge.querySelector('i').addEventListener('click', removeCallback);
