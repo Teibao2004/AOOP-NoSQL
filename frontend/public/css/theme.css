@@ -8,6 +8,7 @@
     --light-border: #dddddd;
     --light-card-bg: #ffffff;
     --light-hover: #e9e9e9;
+    --light-button-hover: #f0f0f0;  /* Nova cor para hover em botões no modo claro */
     
     /* Modo escuro - Cores neutras */
     --dark-bg: #1a1a1a;
@@ -133,6 +134,13 @@ body.dark-mode {
     border-color: var(--dark-border);
 }
 
+/* Corrigido o hover dos botões no modo claro */
+.btn-outline-secondary:hover {
+    background-color: var(--light-button-hover);
+    color: var(--light-text);
+    border-color: var(--light-secondary);
+}
+
 .dark-mode .btn-outline-secondary {
     color: var(--dark-text);
     border-color: var(--dark-border);
@@ -171,9 +179,72 @@ body.dark-mode {
     color: var(--dark-bg);
 }
 
-/* Slider de classificação */
+/* Slider de classificação - Estilizado para ficar mais bonito */
 .rating-slider {
     margin: 30px 10px;
+}
+
+/* Estilização do slider noUiSlider */
+.noUi-target {
+    border-radius: 10px;
+    border: none;
+    box-shadow: none;
+    height: 8px;
+    background-color: #e0e0e0;
+}
+
+.dark-mode .noUi-target {
+    background-color: #444;
+}
+
+.noUi-connect {
+    background: var(--light-primary);
+    border-radius: 10px;
+}
+
+.dark-mode .noUi-connect {
+    background: var(--dark-primary);
+}
+
+.noUi-handle {
+    border: none;
+    border-radius: 50%;
+    background: var(--light-primary);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 20px !important;
+    height: 20px !important;
+    right: -10px !important;
+    top: -6px !important;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dark-mode .noUi-handle {
+    background: var(--dark-primary);
+}
+
+.noUi-handle:hover {
+    transform: scale(1.2);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.noUi-handle:before,
+.noUi-handle:after {
+    display: none;
+}
+
+.noUi-tooltip {
+    border: none;
+    background: var(--light-primary);
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.dark-mode .noUi-tooltip {
+    background: var(--dark-primary);
+    color: var(--dark-bg);
 }
 
 .rating-values {
@@ -181,6 +252,8 @@ body.dark-mode {
     justify-content: space-between;
     margin-top: 10px;
     transition: color var(--transition-speed);
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .dark-mode .rating-values {
@@ -193,6 +266,11 @@ body.dark-mode {
     transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
+.results-per-page-btn:hover {
+    background-color: var(--light-button-hover);
+    color: var(--light-text);
+}
+
 .results-per-page-btn.active {
     background-color: var(--light-primary);
     color: white;
@@ -201,6 +279,10 @@ body.dark-mode {
 .dark-mode .results-per-page-btn.active {
     background-color: var(--dark-primary);
     color: var(--dark-bg);
+}
+
+.dark-mode .results-per-page-btn:hover:not(.active) {
+    background-color: var(--dark-hover);
 }
 
 .results-per-page-btn:first-child {
@@ -398,8 +480,8 @@ body.dark-mode {
 }
 
 .back-button:hover {
-    background-color: var(--light-primary);
-    color: var(--light-bg);
+    background-color: var(--light-button-hover);
+    color: var(--light-primary);
 }
 
 .dark-mode .back-button {
@@ -448,6 +530,11 @@ body.dark-mode {
 .btn-outline-primary {
     color: var(--light-primary);
     border-color: var(--light-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--light-button-hover);
+    color: var(--light-primary);
 }
 
 .dark-mode .btn-outline-primary {
