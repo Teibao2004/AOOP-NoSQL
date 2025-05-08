@@ -515,6 +515,14 @@ body.dark-mode {
 }
 
 /* Botões e badges específicos */
+.btn:hover {
+    background-color: var(--dark-hover);
+}
+
+.btn:active {
+    background-color: var(--dark-hover);
+}
+
 .btn-primary {
     background-color: var(--light-primary);
     border-color: var(--light-primary);
@@ -534,12 +542,20 @@ body.dark-mode {
 
 .btn-outline-primary:hover {
     background-color: var(--light-button-hover);
-    color: var(--light-primary);
+    color: var(--light-text);
+    border-color: var(--light-secondary);
+}
+
+.btn-outline-primary:active {
+    background-color: var(--light-primary);
+    color: white;
+    border-color: var(--light-primary);
 }
 
 .dark-mode .btn-outline-primary {
     color: var(--dark-primary);
     border-color: var(--dark-primary);
+    
 }
 
 .dark-mode .btn-outline-primary:hover {
