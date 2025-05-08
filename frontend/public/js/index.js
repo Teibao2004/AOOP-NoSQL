@@ -284,7 +284,7 @@ function renderMovies(movies) {
                     <p class="card-text">${movie.year || 'Ano desconhecido'}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <span class="badge bg-warning text-dark">⭐ ${rating}</span>
-                        <a href="movie-details.html?id=${movie._id}" class="btn btn-sm btn-primary">Ver detalhes</a>
+                        <a href="movie-details.html?id=${movie._id}" class="btn btn-sm btn-detalhes btn-primary">Ver detalhes</a>
                     </div>
                 </div>
             </div>

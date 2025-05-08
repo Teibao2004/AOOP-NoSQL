@@ -515,11 +515,11 @@ body.dark-mode {
 }
 
 /* Botões e badges específicos */
-.btn:hover {
+.btn-detalhes:hover {
     background-color: var(--dark-hover);
 }
 
-.btn:active {
+.btn-detalhes:active {
     background-color: var(--dark-hover);
 }
 
