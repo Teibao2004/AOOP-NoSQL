@@ -521,6 +521,7 @@ body.dark-mode {
 
 .btn-detalhes:active {
     background-color: var(--dark-hover) !important;
+    border-color: var(--dark-hover) !important;
 }
 
 .btn-primary {
